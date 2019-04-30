@@ -1,16 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [Range(5f, 20f)]
-    public float speed = 5f;
+    public float speed = 2f;
     private Rigidbody2D rb2d;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
-    private string lastKeyMovement;
+
+    private float VelX, VelY;
+    private Boolean up, down, left, right;
 
 
     // Start is called before the first frame update
@@ -23,49 +26,79 @@ public class PlayerController : MonoBehaviour
 
 
     // Update is called once per frame
+    // Update is called once per frame
     void Update()
     {
-        bool userActionW = Input.GetKeyDown("w");
-        bool userActionA = Input.GetKeyDown("a");
-        bool userActionS = Input.GetKeyDown("s");
-        bool userActionD = Input.GetKeyDown("d");
-
-        if (userActionW || userActionA || userActionS || userActionD)
+        VelX = Input.GetAxisRaw("Horizontal");
+        VelY = Input.GetAxisRaw("Vertical");
+        if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
         {
             spriteRenderer.flipX = false;
-            if (userActionA)
+            if (VelX < 0)
             {
-                lastKeyMovement = "A";
-                UpdateState("PlayerIdleLeft");
+                UpdateState("PlayerMovementLeft");
+                left = true;
+                up = false;
+                down = false;
+                right = false;
             }
-            if (userActionD)
+            if (VelX > 0)
             {
-                lastKeyMovement = "D";
                 spriteRenderer.flipX = true;
-                UpdateState("PlayerIdleLeft");
+                UpdateState("PlayerMovementLeft");
+                right = true;
+                up = false;
+                down = false;
+                left = false;
             }
-            if (userActionW)
+            if (VelY > 0)
             {
-                lastKeyMovement = "W";
-                //UpdateState("PlayerIdleUp");
+                UpdateState("PlayerMovementUp");
+                up = true;
+                down = false;
+                left = false;
+                right = false;
             }
-            if (userActionS)
+            if (VelY < 0)
             {
-                lastKeyMovement = "S";
-                UpdateState("PlayerIdleDown");
+                UpdateState("PlayerMovementDown");
+                down = true;
+                up = false;
+                left = false;
+                right = false;
             }
 
-            
 
         }
         else if (!Input.anyKey)
         {
-            UpdateState("PlayerIdleDown");
+            spriteRenderer.flipX = false;
+            if (left)
+            {
+                UpdateState("PlayerIdleLeft");
+            }
+            else if (right)
+            {
+                spriteRenderer.flipX = true;
+                UpdateState("PlayerIdleLeft");
+            }
+            else if (up)
+            {
+                UpdateState("PlayerIdleUp");
+            }
+            else if (down)
+            {
+                UpdateState("PlayerIdleDown");
+            }
         }
     }
 
+    private void LateUpdate()
+    {
+        rb2d.velocity = new Vector2(VelX * 2, VelY * 2);
+    }
 
-    public void UpdateState(string state = null)
+    void UpdateState(string state = null)
     {
         if (state != null)
         {
@@ -74,16 +107,4 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    void LastUpdate()
-    {
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
-        bool spacePressed = Input.GetKeyDown("space");
-
-        Vector2 movement = new Vector2(moveHorizontal * speed, moveVertical * speed);
-
-        rb2d.velocity = movement;
-
-
-    }
 }
