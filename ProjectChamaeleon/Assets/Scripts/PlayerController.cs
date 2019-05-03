@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
                 down = false;
                 right = false;
             }
-            if (VelX > 0)
+            else if (VelX > 0)
             {
                 spriteRenderer.flipX = true;
                 UpdateState("PlayerMovementLeft");
@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
                 down = false;
                 left = false;
             }
-            if (VelY > 0)
+            else if(VelY > 0)
             {
                 UpdateState("PlayerMovementUp");
                 up = true;
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
                 left = false;
                 right = false;
             }
-            if (VelY < 0)
+            else if(VelY < 0)
             {
                 UpdateState("PlayerMovementDown");
                 down = true;
