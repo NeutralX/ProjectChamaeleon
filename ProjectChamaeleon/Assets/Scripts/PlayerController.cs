@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Range(5f, 20f)]
+    [Range(2f, 20f)]
     public float speed = 2f;
     private Rigidbody2D rb2d;
     private Animator animator;
@@ -14,6 +14,12 @@ public class PlayerController : MonoBehaviour
 
     private float VelX, VelY;
     private Boolean up, down, left, right;
+
+    public Transform  attackPos;
+    public LayerMask whatIsEnemies;
+    public float attackRange;
+
+    public int health;
 
 
     // Start is called before the first frame update
@@ -31,7 +37,17 @@ public class PlayerController : MonoBehaviour
     {
         VelX = Input.GetAxisRaw("Horizontal");
         VelY = Input.GetAxisRaw("Vertical");
-        if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
+        if (Input.GetButton("Fire1"))
+        {
+            Attack("PlayerAttackLeft");
+            Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
+            for (int i = 0; i < enemiesToDamage.Length; i++)
+            {
+                enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+            }
+            
+        }
+        else if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
         {
             spriteRenderer.flipX = false;
             if (VelX < 0)
@@ -67,9 +83,37 @@ public class PlayerController : MonoBehaviour
                 left = false;
                 right = false;
             }
-
-
         }
+        else if (Input.GetKey(KeyCode.UpArrow))
+        {
+            up = true;
+                down = false;
+                left = false;
+                right = false;
+        }
+        else if(Input.GetKey(KeyCode.DownArrow))
+        {
+            down = true;
+                up = false;
+                left = false;
+                right = false;
+        }
+        else if(Input.GetKey(KeyCode.LeftArrow))
+        {
+            left = true;
+                up = false;
+                down = false;
+                right = false;
+        }
+
+        else if(Input.GetKey(KeyCode.RightArrow))
+        {
+            right = true;
+                up = false;
+                down = false;
+                left = false;
+        }
+
         else if (!Input.anyKey)
         {
             spriteRenderer.flipX = false;
@@ -95,7 +139,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        rb2d.velocity = new Vector2(VelX * 2, VelY * 2);
+        rb2d.velocity = new Vector2(VelX * speed, VelY * speed);
     }
 
     void UpdateState(string state = null)
@@ -105,6 +149,24 @@ public class PlayerController : MonoBehaviour
             animator.Play(state);
         }
     }
+
+    private IEnumerator Attack(string state)
+{
+    // Play the animation for getting suck in
+    animator.Play(state);
+
+    yield return new WaitForSeconds(3);
+
+    // Move this object somewhere off the screen
+
+}
+
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPos.position, attackRange);
+    }
+
+
 
 
 }
