@@ -15,7 +15,10 @@ public class PlayerController : MonoBehaviour
     private float VelX, VelY;
     private Boolean up, down, left, right;
 
-    public Transform  attackPos;
+    public Transform  attackPosLeft;
+    public Transform  attackPosRight;
+    public Transform  attackPosUp;
+    public Transform  attackPosDown;
     public LayerMask whatIsEnemies;
     public float attackRange;
 
@@ -35,21 +38,53 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        spriteRenderer.flipX = false;
+        //TODO: Esperar a que la animacio d'atacar acabi. Mentres ataca, true boolean i esperar el trigger de colisio de l'enemic. Si no, false boolean.
         VelX = Input.GetAxisRaw("Horizontal");
         VelY = Input.GetAxisRaw("Vertical");
         if (Input.GetButton("Fire1"))
         {
-            Attack("PlayerAttackLeft");
-            Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
-            for (int i = 0; i < enemiesToDamage.Length; i++)
+            if (left)
             {
-                enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                UpdateState("PlayerAttackLeft");
+                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosLeft.position, attackRange, whatIsEnemies);
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                }
+            } else if (right)
+            {
+                spriteRenderer.flipX = true;
+                UpdateState("PlayerAttackRight");
+                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosRight.position, attackRange, whatIsEnemies);
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                }
+            }else if (up)
+            {
+                UpdateState("PlayerAttackUp");
+                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosUp.position, attackRange, whatIsEnemies);
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                }
+            }else if (down)
+            {
+                UpdateState("PlayerAttackDown");
+                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosDown.position, attackRange, whatIsEnemies);
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                }
             }
             
+            
+
         }
         else if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
         {
-            spriteRenderer.flipX = false;
+            //spriteRenderer.flipX = false;
             if (VelX < 0)
             {
                 UpdateState("PlayerMovementLeft");
@@ -116,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
         else if (!Input.anyKey)
         {
-            spriteRenderer.flipX = false;
+            //spriteRenderer.flipX = false;
             if (left)
             {
                 UpdateState("PlayerIdleLeft");
@@ -150,20 +185,33 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private IEnumerator Attack(string state)
-{
-    // Play the animation for getting suck in
-    animator.Play(state);
-
-    yield return new WaitForSeconds(3);
-
-    // Move this object somewhere off the screen
-
-}
 
     void OnDrawGizmosSelected() {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPos.position, attackRange);
+        Gizmos.DrawWireSphere(attackPosLeft.position, attackRange);
+        Gizmos.DrawWireSphere(attackPosRight.position, attackRange);
+        Gizmos.DrawWireSphere(attackPosUp.position, attackRange);
+        Gizmos.DrawWireSphere(attackPosDown.position, attackRange);
+    }
+    
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        /*if (other.gameObject.CompareTag("Stairs"))
+        {
+            
+            game.GetComponent<GameController>().gameState = GameState.Ended;
+            enemyGenerator.SendMessage("CancelGenerator",true);
+            game.SendMessage("ResetTimeScale", 0.5f);
+            
+            game.GetComponent<AudioSource>().Stop();
+            audioPlayer.clip = dieClip;
+            audioPlayer.Play();
+            
+            DustStop();
+        } else if (other.gameObject.CompareTag("Point"))
+        {
+            game.SendMessage("IncreasePoints");
+        }*/
     }
 
 
