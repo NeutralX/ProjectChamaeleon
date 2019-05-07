@@ -11,6 +11,13 @@ public class EnemyController : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     protected Vector2 direction;
+    
+    private float timeBtwAttacks;
+    public float startTimeBtwAttack;
+    
+    public Transform  attackPos;
+    public LayerMask whatIsEnemies;
+    public float attackRange;
 
     public int health = 5;
     
@@ -40,7 +47,8 @@ public class EnemyController : MonoBehaviour
         //print("Y: " + direction.y);
         if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
         {
-            spriteRenderer.flipX = false;
+            //spriteRenderer.flipX = false;
+            transform.localScale = new Vector2(1,1);
             //if (VelY > 0.50 && VelY < 0.60)
             //{
             //    UpdateState("EnemyMovementUp");
@@ -55,7 +63,8 @@ public class EnemyController : MonoBehaviour
             }
             else if (VelX > 0)
             {
-                spriteRenderer.flipX = true;
+                //spriteRenderer.flipX = true;
+                transform.localScale = new Vector2(-1,1);
                 UpdateState("EnemyMovementLeft");
             }
             
@@ -70,10 +79,21 @@ public class EnemyController : MonoBehaviour
 
 
 
-            //if (Vector3.Distance(transform.position, Player.position) <= MaxDist)
-            //{
-            //    //Here Call any function U want Like Shoot at here or something
-            //}
+            if (Vector2.Distance(transform.position, target.position) >= 2 && timeBtwAttacks <= 0)
+            {
+                //UpdateState("PlayerAttackLeft");
+                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    enemiesToDamage[i].GetComponent<PlayerController>().healthLost(1);
+                }
+                
+                timeBtwAttacks = startTimeBtwAttack;
+            }
+            else
+            {
+                timeBtwAttacks -= Time.deltaTime;
+            }
 
         }
 
@@ -91,8 +111,12 @@ public class EnemyController : MonoBehaviour
         }
 
     public void TakeDamage(int damage){
-        Debug.Log(health + "damage TAKEN" + damage);
-            health =- damage;
+        health -= damage;
            
-        }
+    }
+    
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPos.position, attackRange);
+    }
 }

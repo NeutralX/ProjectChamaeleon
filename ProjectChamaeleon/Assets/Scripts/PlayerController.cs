@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,27 +11,24 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb2d;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-
+    private GameController game;
+    public Slider healthslider;
 
     private float VelX, VelY;
-    private Boolean up, down, left, right;
-
-    public Transform  attackPosLeft;
-    public Transform  attackPosRight;
-    public Transform  attackPosUp;
-    public Transform  attackPosDown;
-    public LayerMask whatIsEnemies;
-    public float attackRange;
-
-    public int health;
+    public Boolean up, down, left, right;
+    
+    public int health = 10;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        healthslider.maxValue = health;
+        healthslider.value = health;
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
+        game = gameObject.GetComponent<GameController>();
     }
 
 
@@ -38,53 +36,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        spriteRenderer.flipX = false;
         //TODO: Esperar a que la animacio d'atacar acabi. Mentres ataca, true boolean i esperar el trigger de colisio de l'enemic. Si no, false boolean.
         VelX = Input.GetAxisRaw("Horizontal");
         VelY = Input.GetAxisRaw("Vertical");
-        if (Input.GetButton("Fire1"))
+        if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
         {
-            if (left)
-            {
-                UpdateState("PlayerAttackLeft");
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosLeft.position, attackRange, whatIsEnemies);
-                for (int i = 0; i < enemiesToDamage.Length; i++)
-                {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
-                }
-            } else if (right)
-            {
-                spriteRenderer.flipX = true;
-                UpdateState("PlayerAttackRight");
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosRight.position, attackRange, whatIsEnemies);
-                for (int i = 0; i < enemiesToDamage.Length; i++)
-                {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
-                }
-            }else if (up)
-            {
-                UpdateState("PlayerAttackUp");
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosUp.position, attackRange, whatIsEnemies);
-                for (int i = 0; i < enemiesToDamage.Length; i++)
-                {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
-                }
-            }else if (down)
-            {
-                UpdateState("PlayerAttackDown");
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosDown.position, attackRange, whatIsEnemies);
-                for (int i = 0; i < enemiesToDamage.Length; i++)
-                {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
-                }
-            }
             
-            
-
-        }
-        else if (VelX != 0 || (VelY != 0 && VelX != 0) || (VelY != 0 && VelX == 0))
-        {
-            //spriteRenderer.flipX = false;
+            spriteRenderer.flipX = false;
             if (VelX < 0)
             {
                 UpdateState("PlayerMovementLeft");
@@ -151,7 +109,7 @@ public class PlayerController : MonoBehaviour
 
         else if (!Input.anyKey)
         {
-            //spriteRenderer.flipX = false;
+            spriteRenderer.flipX = false;
             if (left)
             {
                 UpdateState("PlayerIdleLeft");
@@ -177,41 +135,32 @@ public class PlayerController : MonoBehaviour
         rb2d.velocity = new Vector2(VelX * speed, VelY * speed);
     }
 
-    void UpdateState(string state = null)
+    public void UpdateState(string state = null)
     {
         if (state != null)
         {
             animator.Play(state);
         }
     }
-
-
-    void OnDrawGizmosSelected() {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPosLeft.position, attackRange);
-        Gizmos.DrawWireSphere(attackPosRight.position, attackRange);
-        Gizmos.DrawWireSphere(attackPosUp.position, attackRange);
-        Gizmos.DrawWireSphere(attackPosDown.position, attackRange);
-    }
+    
     
     void OnTriggerEnter2D(Collider2D other)
     {
-        /*if (other.gameObject.CompareTag("Stairs"))
+        if (other.gameObject.CompareTag("Stairs"))
         {
+            game.SendMessage("ChangeFloor");
             
-            game.GetComponent<GameController>().gameState = GameState.Ended;
-            enemyGenerator.SendMessage("CancelGenerator",true);
-            game.SendMessage("ResetTimeScale", 0.5f);
-            
-            game.GetComponent<AudioSource>().Stop();
-            audioPlayer.clip = dieClip;
-            audioPlayer.Play();
-            
-            DustStop();
-        } else if (other.gameObject.CompareTag("Point"))
+        } else if (other.gameObject.CompareTag("Food"))
         {
-            game.SendMessage("IncreasePoints");
-        }*/
+            //game.SendMessage("IncreasePoints");
+        }
+    }
+    
+    public void healthLost(int damage)
+    {
+        health -= damage;
+        healthslider.value = health;
+
     }
 
 
