@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     protected Vector2 direction;
+    private Animation animation;
     
     private float timeBtwAttacks;
     public float startTimeBtwAttack;
@@ -77,24 +78,21 @@ public class EnemyController : MonoBehaviour
             
             transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
 
-
-
-            if (Vector2.Distance(transform.position, target.position) >= 2 && timeBtwAttacks <= 0)
+        }
+        if (Vector2.Distance(transform.position, target.position) <= 3 && timeBtwAttacks <= 0)
+        {
+            UpdateState("EnemyAttackLeft");
+            Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
+            for (int i = 0; i < enemiesToDamage.Length; i++)
             {
-                //UpdateState("PlayerAttackLeft");
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
-                for (int i = 0; i < enemiesToDamage.Length; i++)
-                {
-                    enemiesToDamage[i].GetComponent<PlayerController>().healthLost(1);
-                }
+                enemiesToDamage[i].GetComponent<PlayerController>().healthLost(1);
+            }
                 
-                timeBtwAttacks = startTimeBtwAttack;
-            }
-            else
-            {
-                timeBtwAttacks -= Time.deltaTime;
-            }
-
+            timeBtwAttacks = startTimeBtwAttack;
+        }
+        else
+        {
+            timeBtwAttacks -= Time.deltaTime;
         }
 
         
@@ -107,8 +105,18 @@ public class EnemyController : MonoBehaviour
             if (state != null)
             {
                 animator.Play(state);
+                animation  = animator.GetComponent<Animation>();
+                WaitForAnimation( animation );
             }
         }
+    
+    private IEnumerator WaitForAnimation ( Animation animation )
+    {
+        do
+        {
+            yield return null;
+        } while ( animation.isPlaying );
+    }
 
     public void TakeDamage(int damage){
         health -= damage;

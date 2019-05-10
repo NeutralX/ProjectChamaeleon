@@ -160,6 +160,10 @@ public class PlayerController : MonoBehaviour
     {
         health -= damage;
         healthslider.value = health;
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
 
     }
 
