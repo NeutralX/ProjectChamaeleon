@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb2d;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private GameController game;
+    public GameObject game;
     public Slider healthslider;
 
     private float VelX, VelY;
@@ -28,7 +28,6 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
-        game = gameObject.GetComponent<GameController>();
     }
 
 
@@ -148,7 +147,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Stairs"))
         {
-            game.SendMessage("ChangeFloor");
+            game.GetComponent<GameController>().SendMessage("ChangeFloor");
             
         } else if (other.gameObject.CompareTag("Food"))
         {
