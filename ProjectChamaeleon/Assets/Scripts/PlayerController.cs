@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     public GameObject game;
     public Slider healthslider;
+    private AudioSource audioPlayer;
+    public AudioClip die;
+    public AudioClip pickItem;
+    public AudioClip heal;
 
     private float VelX, VelY;
     public Boolean up, down, left, right;
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
+        audioPlayer = GetComponent<AudioSource>();
     }
 
 
@@ -145,13 +150,16 @@ public class PlayerController : MonoBehaviour
     
     void OnTriggerEnter2D(Collider2D other)
     {
+        audioPlayer.clip = pickItem;
+        audioPlayer.Play();
         if (other.gameObject.CompareTag("Stairs"))
         {
             game.GetComponent<GameController>().SendMessage("ChangeFloor");
             
         } else if (other.gameObject.CompareTag("Food"))
         {
-            //game.SendMessage("IncreasePoints");
+            other.gameObject.SetActive(false);
+            healthHeal(4);
         }
     }
     
@@ -164,6 +172,23 @@ public class PlayerController : MonoBehaviour
             Destroy(gameObject);
         }
 
+    }
+
+    public void healthHeal(int heal)
+    {
+        audioPlayer.clip = this.heal;
+        audioPlayer.Play();
+        if (health + heal > 10)
+        {
+            health = 10;
+            
+        }
+        else
+        {
+            health += heal;
+        }
+        
+        healthslider.value = health; 
     }
 
 

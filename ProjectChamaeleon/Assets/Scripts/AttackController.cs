@@ -18,12 +18,15 @@ public class AttackController : MonoBehaviour
     public Transform  attackPosDown;
     public LayerMask whatIsEnemies;
     public float attackRange;
+    private AudioSource audioPlayer;
+    public AudioClip attack;
     
     // Start is called before the first frame update
     void Start()
     {
     playerController = gameObject.GetComponent<PlayerController>();
     spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    audioPlayer = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -35,6 +38,8 @@ public class AttackController : MonoBehaviour
             if (playerController.left)
             {
                 playerController.UpdateState("PlayerAttackLeft");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
                 Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosLeft.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
@@ -44,6 +49,8 @@ public class AttackController : MonoBehaviour
             {
                 spriteRenderer.flipX = true;
                 playerController.UpdateState("PlayerAttackRight");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
                 Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosRight.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
@@ -52,6 +59,8 @@ public class AttackController : MonoBehaviour
             }else if (playerController.up)
             {
                 playerController.UpdateState("PlayerAttackUp");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
                 Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosUp.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
@@ -60,6 +69,8 @@ public class AttackController : MonoBehaviour
             }else if (playerController.down)
             {
                 playerController.UpdateState("PlayerAttackDown");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
                 Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosDown.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {

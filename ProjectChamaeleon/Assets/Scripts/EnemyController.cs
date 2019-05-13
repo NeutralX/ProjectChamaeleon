@@ -12,6 +12,8 @@ public class EnemyController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     protected Vector2 direction;
     private Animation animation;
+    private AudioSource audioPlayer;
+    public AudioClip attack;
     
     private float timeBtwAttacks;
     public float startTimeBtwAttack;
@@ -31,6 +33,7 @@ public class EnemyController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
+        audioPlayer = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -81,10 +84,13 @@ public class EnemyController : MonoBehaviour
         }
         if (Vector2.Distance(transform.position, target.position) <= 3 && timeBtwAttacks <= 0)
         {
-            UpdateState("EnemyAttackLeft");
+
             Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
             for (int i = 0; i < enemiesToDamage.Length; i++)
             {
+                UpdateState("EnemyAttackLeft");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
                 enemiesToDamage[i].GetComponent<PlayerController>().healthLost(1);
             }
                 
