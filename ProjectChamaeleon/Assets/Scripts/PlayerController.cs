@@ -169,6 +169,8 @@ public class PlayerController : MonoBehaviour
         healthslider.value = health;
         if (health <= 0)
         {
+            audioPlayer.clip = die;
+            audioPlayer.Play();
             Destroy(gameObject);
         }
 
