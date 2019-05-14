@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private float VelX, VelY;
     public Boolean up, down, left, right;
     
-    public int health = 10;
+    public int health;
 
 
     // Start is called before the first frame update
@@ -33,6 +33,17 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
         audioPlayer = GetComponent<AudioSource>();
+        String difficulty = PlayerPrefs.GetString("Difficulty", " ");
+        if (difficulty == "easy")
+        {
+            health = 20;
+            GetComponent<AttackController>().playerDamage = 3;
+
+        } else if (difficulty == "hard")
+        {
+            health = 10;
+            GetComponent<AttackController>().playerDamage = 1;
+        }
     }
 
 

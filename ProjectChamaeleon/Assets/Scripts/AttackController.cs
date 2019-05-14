@@ -1,32 +1,34 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackController : MonoBehaviour
 {
-    
     private float timeBtwAttacks;
     public float startTimeBtwAttack;
 
     private PlayerController playerController;
 
     private SpriteRenderer spriteRenderer;
-    
-    public Transform  attackPosLeft;
-    public Transform  attackPosRight;
-    public Transform  attackPosUp;
-    public Transform  attackPosDown;
+
+    public Transform attackPosLeft;
+    public Transform attackPosRight;
+    public Transform attackPosUp;
+    public Transform attackPosDown;
     public LayerMask whatIsEnemies;
     public float attackRange;
     private AudioSource audioPlayer;
     public AudioClip attack;
-    
+
+    public int playerDamage;
+
     // Start is called before the first frame update
     void Start()
     {
-    playerController = gameObject.GetComponent<PlayerController>();
-    spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-    audioPlayer = GetComponent<AudioSource>();
+        playerController = gameObject.GetComponent<PlayerController>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        audioPlayer = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -40,59 +42,65 @@ public class AttackController : MonoBehaviour
                 playerController.UpdateState("PlayerAttackLeft");
                 audioPlayer.clip = attack;
                 audioPlayer.Play();
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosLeft.position, attackRange, whatIsEnemies);
+                Collider2D[] enemiesToDamage =
+                    Physics2D.OverlapCircleAll(attackPosLeft.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(playerDamage);
                 }
-            } else if (playerController.right)
+            }
+            else if (playerController.right)
             {
                 spriteRenderer.flipX = true;
                 playerController.UpdateState("PlayerAttackRight");
                 audioPlayer.clip = attack;
                 audioPlayer.Play();
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosRight.position, attackRange, whatIsEnemies);
+                Collider2D[] enemiesToDamage =
+                    Physics2D.OverlapCircleAll(attackPosRight.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(playerDamage);
                 }
-            }else if (playerController.up)
+            }
+            else if (playerController.up)
             {
                 playerController.UpdateState("PlayerAttackUp");
                 audioPlayer.clip = attack;
                 audioPlayer.Play();
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosUp.position, attackRange, whatIsEnemies);
+                Collider2D[] enemiesToDamage =
+                    Physics2D.OverlapCircleAll(attackPosUp.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(playerDamage);
                 }
-            }else if (playerController.down)
+            }
+            else if (playerController.down)
             {
                 playerController.UpdateState("PlayerAttackDown");
                 audioPlayer.clip = attack;
                 audioPlayer.Play();
-                Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPosDown.position, attackRange, whatIsEnemies);
+                Collider2D[] enemiesToDamage =
+                    Physics2D.OverlapCircleAll(attackPosDown.position, attackRange, whatIsEnemies);
                 for (int i = 0; i < enemiesToDamage.Length; i++)
                 {
-                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(1);
+                    enemiesToDamage[i].GetComponent<EnemyController>().TakeDamage(playerDamage);
                 }
             }
 
             timeBtwAttacks = startTimeBtwAttack;
-            
         }
         else
         {
             timeBtwAttacks -= Time.deltaTime;
         }
-        
     }
-    void OnDrawGizmosSelected() {
+
+    void OnDrawGizmosSelected()
+    {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPosLeft.position, attackRange);
         Gizmos.DrawWireSphere(attackPosRight.position, attackRange);
         Gizmos.DrawWireSphere(attackPosUp.position, attackRange);
         Gizmos.DrawWireSphere(attackPosDown.position, attackRange);
     }
-    
 }
