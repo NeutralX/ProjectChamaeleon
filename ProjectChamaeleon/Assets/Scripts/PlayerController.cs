@@ -27,8 +27,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        healthslider.maxValue = health;
-        healthslider.value = health;
+        
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
@@ -44,6 +43,8 @@ public class PlayerController : MonoBehaviour
             health = 10;
             GetComponent<AttackController>().playerDamage = 1;
         }
+        healthslider.maxValue = health;
+        healthslider.value = health;
     }
 
 
@@ -183,6 +184,7 @@ public class PlayerController : MonoBehaviour
             audioPlayer.clip = die;
             audioPlayer.Play();
             Destroy(gameObject);
+            game.SendMessage("RestartGame");
         }
 
     }
@@ -191,9 +193,9 @@ public class PlayerController : MonoBehaviour
     {
         audioPlayer.clip = this.heal;
         audioPlayer.Play();
-        if (health + heal > 10)
+        if (health + heal > healthslider.maxValue)
         {
-            health = 10;
+            health = (int) healthslider.maxValue;
             
         }
         else

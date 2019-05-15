@@ -19,6 +19,8 @@ public class EnemyController : MonoBehaviour
     public float startTimeBtwAttack;
     
     public Transform  attackPos;
+    public Transform  attackUp;
+    public Transform  attackDown;
     public LayerMask whatIsEnemies;
     public float attackRange;
 
@@ -63,13 +65,13 @@ public class EnemyController : MonoBehaviour
             //}
              if (VelX < 0)
             {
-                UpdateState("EnemyMovementLeft");
+                //UpdateState("EnemyMovementLeft");
             }
             else if (VelX > 0)
             {
                 //spriteRenderer.flipX = true;
                 transform.localScale = new Vector2(-1,1);
-                UpdateState("EnemyMovementLeft");
+                //UpdateState("EnemyMovementLeft");
             }
             
             
@@ -92,6 +94,24 @@ public class EnemyController : MonoBehaviour
                 audioPlayer.clip = attack;
                 audioPlayer.Play();
                 enemiesToDamage[i].GetComponent<PlayerController>().healthLost(1);
+            }
+            
+            Collider2D[] enemiesToDamageUp = Physics2D.OverlapCircleAll(attackUp.position, attackRange, whatIsEnemies);
+            for (int i = 0; i < enemiesToDamageUp.Length; i++)
+            {
+                UpdateState("EnemyAttackUp");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
+                enemiesToDamageUp[i].GetComponent<PlayerController>().healthLost(1);
+            }
+            
+            Collider2D[] enemiesToDamageDown = Physics2D.OverlapCircleAll(attackDown.position, attackRange, whatIsEnemies);
+            for (int i = 0; i < enemiesToDamageDown.Length; i++)
+            {
+                UpdateState("EnemyAttackDown");
+                audioPlayer.clip = attack;
+                audioPlayer.Play();
+                enemiesToDamageDown[i].GetComponent<PlayerController>().healthLost(1);
             }
                 
             timeBtwAttacks = startTimeBtwAttack;
@@ -132,5 +152,7 @@ public class EnemyController : MonoBehaviour
     void OnDrawGizmosSelected() {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos.position, attackRange);
+        Gizmos.DrawWireSphere(attackUp.position, attackRange);
+        Gizmos.DrawWireSphere(attackDown.position, attackRange);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,7 @@ public class GameController : MonoBehaviour
     public GameObject winScreen;
     public GameObject BossFloor;
     public GameObject Bulbasaur;
+    public TextMeshProUGUI timeTextWin;
     
     public GameObject prefabRaticate;
     public GameObject prefabBoss;
@@ -21,6 +23,7 @@ public class GameController : MonoBehaviour
     private TimerController timer;
 
     private AudioSource backgroundMusic;
+    public AudioClip bossTheme;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +33,7 @@ public class GameController : MonoBehaviour
         TinyWoodsFloor1.SetActive(true);
         TinyWoodsFloor2.SetActive(false);
         BossFloor.SetActive(false);
-        Bulbasaur.transform.position = new Vector3(-4f, -1.54606f, 1f);
+        Bulbasaur.transform.position = new Vector3(-3.67f, -4.07f, 1f);
         backgroundMusic.Play();
     }
 
@@ -71,11 +74,23 @@ public class GameController : MonoBehaviour
         {
             enemies[i].SetActive(false);
         }
+        GameObject[] food = GameObject.FindGameObjectsWithTag("Food");
+        for (int i = 0; i < food.Length; i++)
+        {
+            food[i].SetActive(false);
+        }
         if (TinyWoodsFloor1.activeSelf)
         {
             TinyWoodsFloor1.SetActive(false);
             Bulbasaur.transform.position = new Vector3(5.4f, -5.57f, 1);
             TinyWoodsFloor2.SetActive(true);
+            Instantiate(prefabRaticate, new Vector3(-7.496507f, 4.570717f, 1f), Quaternion.identity);
+            Instantiate(prefabRaticate, new Vector3(4.84f, 3.52f, 1f), Quaternion.identity);
+            Instantiate(prefabRaticate, new Vector3(-6.24f, -6.54f, 1f), Quaternion.identity);
+            Instantiate(prefabRaticate, new Vector3(-3.86f, -6.54f, 1f), Quaternion.identity);
+            Instantiate(prefabRaticate, new Vector3(3.2f, -1.35f, 1f), Quaternion.identity);
+            Instantiate(prefabApple, new Vector3(-0.6815557f, -0.6815557f, 1f), Quaternion.identity);
+            Instantiate(prefabApple, new Vector3(-0.6815557f, 6.587f, 1f), Quaternion.identity);
         } else if (TinyWoodsFloor2.activeSelf)
         {
             TinyWoodsFloor2.SetActive(false);
@@ -83,7 +98,9 @@ public class GameController : MonoBehaviour
             BossFloor.SetActive(true);
             Instantiate(prefabBoss, new Vector3(0.63f, 3.32f, 1f), Quaternion.identity);
             Instantiate(prefabApple, new Vector3(2.62f, 0.16f, 1f), Quaternion.identity);
-            
+            backgroundMusic.clip = bossTheme;
+            backgroundMusic.Play();
+
         }
     }
 
@@ -91,6 +108,7 @@ public class GameController : MonoBehaviour
     {
         timer.SendMessage("Finish");
         winScreen.SetActive(true);
+        timeTextWin.SetText("TIME: " + timer.timerText.text);
         StartCoroutine(waitWinTime());
     }
 
@@ -104,8 +122,14 @@ public class GameController : MonoBehaviour
 
     public void RestartGame()
     {
-        //ResetTimeScale();
-        SceneManager.LoadScene("GameScene");
+        StartCoroutine(waitRestartGame());
+    }
+    
+    IEnumerator waitRestartGame()
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("MainMenu");
+
     }
     
     
